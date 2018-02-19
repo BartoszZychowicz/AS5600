@@ -118,22 +118,14 @@ int main(void)
 	while(1){
 		delay_ms(100);
 		printf("Rozpoczynam petle : %d\n" , i++);
-		//printf("dzialam! \n");
-		//delay_ms(100);
-		//printf("zapytanie do imu! \n");
+
 		uint8_t who_am_i = I2CReadReg(IMU_ADDR, 0x75);
 		if (who_am_i == 0x71) {
 			printf("Akcelerometr OK!\n");
 		}
 		else {
-			//printf("Niepoprawna odpowiedz ukladu(0x%02X)\n", who_am_i);
+			printf("Niepoprawna odpowiedz ukladu(0x%02X)\n", who_am_i);
 		}
-
-
-
-		//printf("Petla %d" , i++);
-
-
 
 		//delay_ms(1000);
 
@@ -196,27 +188,8 @@ int main(void)
 		}
 		if(I2CErrorCount >= 10){
 			I2CErrorCount = 0;
-			I2C_Cmd(I2C1, DISABLE);
-
-			GPIO_InitTypeDef gpio;
-			gpio.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7; // SCL, SDA
-			gpio.GPIO_Mode = GPIO_Mode_Out_OD;
-			gpio.GPIO_Speed = GPIO_Mode_Out_OD;
-			GPIO_Init(GPIOB, &gpio);
-
-			delay_ms(100);
-
-			gpio.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7; // SCL, SDA
-			gpio.GPIO_Mode = GPIO_Mode_AF_OD;
-			gpio.GPIO_Speed = GPIO_Speed_50MHz;
-			GPIO_Init(GPIOB, &gpio);
-
-
-			I2C_SoftwareResetCmd(I2C1, ENABLE);
-			I2C_SoftwareResetCmd(I2C1, DISABLE);
-
-			i2c_initialize();
-			printf("Wykonano reset I2C!\n\n\n\n\n\n\n\\n\n");
+			resetI2C();
+			printf("Wykonano reset I2C!\n\n\n\n\n\n\n\n\n");
 		}
 	}
 }

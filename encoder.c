@@ -11,6 +11,7 @@
 #include "delay.h"
 
 extern uint8_t I2CResult;
+extern void i2c_initialize();
 
 uint8_t I2C_Wait_Condition(I2C_TypeDef* I2Cx, uint32_t I2C_EVENT){			//zwraca 1, jesli wystapil timeout
 	TIM_Cmd(TIM3, ENABLE);
@@ -89,4 +90,27 @@ int16_t I2CReadValue(uint8_t device_addr, uint8_t reg)
 	int16_t value = 0;
 	I2CRead(device_addr, reg, &value, sizeof(value));
 	return value;
+}
+
+void resetI2C(){
+	I2C_Cmd(I2C1, DISABLE);
+
+	GPIO_InitTypeDef gpio;
+	gpio.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7; // SCL, SDA
+	gpio.GPIO_Mode = GPIO_Mode_Out_OD;
+	gpio.GPIO_Speed = GPIO_Mode_Out_OD;
+	GPIO_Init(GPIOB, &gpio);
+
+	delay_ms(100);
+
+	gpio.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7; // SCL, SDA
+	gpio.GPIO_Mode = GPIO_Mode_AF_OD;
+	gpio.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &gpio);
+
+
+	I2C_SoftwareResetCmd(I2C1, ENABLE);
+	I2C_SoftwareResetCmd(I2C1, DISABLE);
+
+	i2c_initialize();
 }

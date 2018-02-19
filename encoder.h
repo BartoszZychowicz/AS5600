@@ -19,5 +19,6 @@ extern void I2CRead(uint8_t device_addr, uint8_t reg, void* data, int size);
 extern void I2CWriteReg(uint8_t device_addr, uint8_t reg, uint8_t value);
 extern uint8_t I2CReadReg(uint8_t device_addr, uint8_t reg);
 extern int16_t I2CReadValue(uint8_t device_addr, uint8_t reg);
+extern void resetI2C();
 
 #endif /* ENCODER_H_ */
