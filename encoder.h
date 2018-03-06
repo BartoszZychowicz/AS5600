@@ -21,4 +21,6 @@ extern uint8_t I2CReadReg(uint8_t device_addr, uint8_t reg);
 extern int16_t I2CReadValue(uint8_t device_addr, uint8_t reg);
 extern void resetI2C();
 
+extern uint8_t AS_readEncoder(float *angleValue);
+
 #endif /* ENCODER_H_ */

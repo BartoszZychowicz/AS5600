@@ -34,7 +34,6 @@ void I2CSetReg(uint8_t device_addr , uint8_t reg)
 	I2C_GenerateSTART(I2C1, ENABLE);
 	I2CResult |= I2C_Wait_Condition(I2C1, I2C_EVENT_MASTER_MODE_SELECT);
 	I2C_Send7bitAddress(I2C1, device_addr, I2C_Direction_Transmitter);
-	TIM_Cmd(TIM3, ENABLE);
 	I2CResult |= I2C_Wait_Condition(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED);
 	I2C_SendData(I2C1, reg);
 	I2CResult |= I2C_Wait_Condition(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING);
@@ -113,4 +112,49 @@ void resetI2C(){
 	I2C_SoftwareResetCmd(I2C1, DISABLE);
 
 	i2c_initialize();
+}
+
+uint8_t AS_readEncoder(float *angleValue){
+	uint8_t res = 0, poprawny = 0;
+	uint8_t result[4];
+	uint8_t temp_result;
+	uint16_t angle = 0;
+
+	temp_result = I2CResult;	//zachowanie wartosci I2CResult, zeby przywrocic ja na koniec funkcji
+	I2CResult = 0;
+
+	res = I2CReadReg(AS5600_ADDR, 0x0B);
+	if (I2CResult == 0){
+		if(res & 0x10){	//magnes za daleko
+			I2CResult = temp_result;
+			poprawny = 2;
+			return poprawny;
+		}
+		if(res & 0x08){ //magnes za blisko
+			I2CResult = temp_result;
+			poprawny = 3;
+			return poprawny;	//mozna w 1 linijce?
+		}
+		if(res & 0x20){	//wykrycie magnesu
+			I2CRead(AS5600_ADDR, 0x0C, &result, 4);
+			if(I2CResult == 0){
+				angle |= (uint16_t)result[2] << 8;
+				angle |= (uint16_t)result[3];
+				*angleValue = (360.0/4096.0)*(float)angle;
+				I2CResult = temp_result;
+				poprawny = 1;
+				return poprawny;
+			}
+			else{
+				poprawny = 0;
+				return poprawny;
+			}
+		}
+	}
+	else{		//odczyt nieudany
+		I2CResult = temp_result;
+		poprawny = 0;
+		return poprawny;
+	}
+	return 0;
 }

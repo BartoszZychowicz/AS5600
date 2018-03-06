@@ -73,7 +73,7 @@ void i2c_initialize(){
 	I2C_InitTypeDef i2c;
 	I2C_StructInit(&i2c);
 	i2c.I2C_Mode = I2C_Mode_I2C;
-	i2c.I2C_ClockSpeed = 10000;
+	i2c.I2C_ClockSpeed = 100000;
 	I2C_Init(I2C1, &i2c);
 	I2C_Cmd(I2C1, ENABLE);
 }
@@ -108,16 +108,14 @@ int main(void)
 {
 
 	STM_StartUp();
-	uint8_t res = 0;
-	uint16_t raw_angle = 0;
-	uint16_t angle = 0;
-	uint8_t result[4] = {0};
+
 	int i = 0;
-	char poprawny = 0;
-	//printf("Start!\n");
+	float angleValue = 0;
+	uint8_t result = 0;
+
 	while(1){
 		delay_ms(100);
-		printf("Rozpoczynam petle : %d\n" , i++);
+		/*printf("Rozpoczynam petle : %d\n" , i++);
 
 		uint8_t who_am_i = I2CReadReg(IMU_ADDR, 0x75);
 		if (who_am_i == 0x71) {
@@ -126,58 +124,23 @@ int main(void)
 		else {
 			printf("Niepoprawna odpowiedz ukladu(0x%02X)\n", who_am_i);
 		}
-
-		//delay_ms(1000);
-
-		poprawny = 0;
-		raw_angle = 0;
-		angle = 0;
-		res = 0;
-
-		res = I2CReadReg(AS5600_ADDR, 0x0B);
-
-		//printf("Stan enkodera: 0x%02X \n", res);
-		if(res & 0x20){
-			//printf("Wykryto magnes \n");
-			poprawny = 2;
-		}
-		if(res & 0x10){
-			//printf("Magnes za daleko \n");
-			poprawny = 1;
-		}
-		if(res & 0x08){
-			//printf("Magnes za blisko \n");
-			poprawny = 1;
+		 */
+		result = AS_readEncoder(&angleValue);
+		switch(result){
+		case 0:
+			printf("Odczyt nieudany!\n");
+			break;
+		case 1:
+			printf("%f\n", angleValue);
+			break;
+		case 2:
+			printf("Magnes za daleko!\n");
+			break;
+		case 3:
+			printf("Magnes za blisko!\n");
+			break;
 		}
 
-
-
-		if(poprawny == 2){
-			printf("Magnes OK!\n");
-			I2CRead(AS5600_ADDR, 0x0C, &result, 4);
-
-			//result = I2CReadReg(AS5600_ADDR, 0x0C);
-			//printf("Rejestr 0x0C: 0x%02X ; Po konwersji: 0x%04X \n", result[0], (uint16_t)result[0] << 8);
-			raw_angle |= (uint16_t)result[0] << 8;
-
-			//result[] = I2CReadReg(AS5600_ADDR, 0x0D);
-			//printf("Rejestr 0x0D: 0x%02X Po konwersji: 0x%04X \n", result[1], (uint16_t)result[1]);
-			raw_angle |= (uint16_t)result[1];
-
-			//printf("Wartosc raw angle: 0x%04X \nDziesietnie: %f\n", raw_angle, (360.0/4096.0)*(float)raw_angle);
-			//printf("Wartosc raw angle: %f\n", (360.0/4096.0)*(float)raw_angle);
-
-			//result[] = I2CReadReg(AS5600_ADDR, 0x0E);
-			//printf("Rejestr 0x0E: 0x%02X ; Po konwersji: 0x%04X \n", result[2], (uint16_t)result[2] << 8);
-			angle |= (uint16_t)result[2] << 8;
-
-			//result[] = I2CReadReg(AS5600_ADDR, 0x0F);
-			//printf("Rejestr 0x0F: 0x%02X Po konwersji: 0x%04X \n", result[3], (uint16_t)result[3]);
-			angle |= (uint16_t)result[3];
-
-			//printf("Wartosc angle: 0x%04X \nDziesietnie: %f\n", angle, (360.0/4096.0)*(float)angle);
-			printf("%f\n", (360.0/4096.0)*(float)angle);
-		}
 		if(I2CResult == 1){
 			printf("Wystapily bledy timeout I2C!\n");
 			I2CErrorCount += 1;
@@ -193,5 +156,6 @@ int main(void)
 		}
 	}
 }
+
 
 
