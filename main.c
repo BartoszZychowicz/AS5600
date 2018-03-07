@@ -109,22 +109,12 @@ int main(void)
 
 	STM_StartUp();
 
-	int i = 0;
 	float angleValue = 0;
 	uint8_t result = 0;
 
 	while(1){
 		delay_ms(100);
-		/*printf("Rozpoczynam petle : %d\n" , i++);
 
-		uint8_t who_am_i = I2CReadReg(IMU_ADDR, 0x75);
-		if (who_am_i == 0x71) {
-			printf("Akcelerometr OK!\n");
-		}
-		else {
-			printf("Niepoprawna odpowiedz ukladu(0x%02X)\n", who_am_i);
-		}
-		 */
 		result = AS_readEncoder(&angleValue);
 		switch(result){
 		case 0:

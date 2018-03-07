@@ -127,13 +127,11 @@ uint8_t AS_readEncoder(float *angleValue){
 	if (I2CResult == 0){
 		if(res & 0x10){	//magnes za daleko
 			I2CResult = temp_result;
-			poprawny = 2;
-			return poprawny;
+			return poprawny = 2;
 		}
 		if(res & 0x08){ //magnes za blisko
 			I2CResult = temp_result;
-			poprawny = 3;
-			return poprawny;	//mozna w 1 linijce?
+			return poprawny = 3;	//mozna w 1 linijce?
 		}
 		if(res & 0x20){	//wykrycie magnesu
 			I2CRead(AS5600_ADDR, 0x0C, &result, 4);
@@ -142,19 +140,15 @@ uint8_t AS_readEncoder(float *angleValue){
 				angle |= (uint16_t)result[3];
 				*angleValue = (360.0/4096.0)*(float)angle;
 				I2CResult = temp_result;
-				poprawny = 1;
-				return poprawny;
+				return poprawny = 1;
 			}
 			else{
-				poprawny = 0;
-				return poprawny;
+				return poprawny = 0;
 			}
 		}
 	}
 	else{		//odczyt nieudany
-		I2CResult = temp_result;
-		poprawny = 0;
-		return poprawny;
+		return poprawny = 0;
 	}
 	return 0;
 }
